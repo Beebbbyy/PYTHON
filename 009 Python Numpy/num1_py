@@ -1,0 +1,38 @@
+import numpy as np
+import time
+import gc
+import sys
+
+assert sys.maxsize > 2 ** 32, "get a new computer!"
+
+# Allocation-sensitive timing needs to be done more carefully
+# Compares runtimes of f1, f2
+def compare_times(f1, f2, setup1=None, setup2=None, runs=5):
+    print('    format: mean seconds (standard error)', runs, 'runs')
+    maxpad = max(len(f.__name__) for f in (f1, f2))
+    means = []
+    for setup, f in [[setup1, f1], [setup2, f2]]:
+        setup = (lambda: tuple()) if setup is None else setup
+        
+        total_times = []
+        for _ in range(runs):
+            try:
+                gc.disable()
+                args = setup()
+                
+                start = time.time()
+                if isinstance(args, tuple):
+                    f(*args)
+                else:
+                    f(args)
+                end = time.time()
+                
+                total_times.append(end - start)
+            finally:
+                gc.enable()
+                
+        mean = np.mean(total_times)
+        se = np.std(total_times) / np.sqrt(len(total_times))
+        print('    {} {:.2e} ({:.2e})'.format(f.__name__.ljust(maxpad), mean, se))
+        means.append(mean)
+    print('    improvement ratio {:.1f}'.format(means[0] / means[1]))
