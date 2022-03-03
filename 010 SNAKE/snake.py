@@ -1,6 +1,4 @@
-from inspect import trace
-from math import ceil
-from tkinter import CENTER
+
 import turtle
 import time
 import random
@@ -90,7 +88,61 @@ while True:
 
         score=0
 
-        delay =
+        delay = 0.1
+        sc.clear()
+        sc.write("score: {} High Score : {}".format(score, high_score), align="center", font=('ds-digital',24,"normal"))
+
+
+    if head.distance(food)<20:
+        x=random.randint(-290,290)
+        y=random.randint(-290,290)
+        food.goto(x,y)
+
+        new_segment=turtle.Turtle()
+        new_segment.speed(0)
+        new_segment.shape("square")
+        new_segment.color("black")
+        new_segment.penup()
+        segments.append(new_segment)
+
+
+        delay=0.001
+        score+=10
+
+        if score>high_score:
+            high_score=score
+        sc.clear()
+        sc.write("score: {} High Score : {}".format(score, high_score), align="center", font=('ds-digital',24,"normal"))
+
+    for index in range(len(segments)-1,0,-1):
+        x=segments[index-1].xcor()
+        y=segments[index-1].ycor()
+        segments[index].goto(x,y)
+
+    if len(segments)>0:
+        x=head.xcor()
+        y=head.ycor()
+        segments[0].goto(x,y)
+
+    move()
+
+    for segment in segments:
+        if segment.distance(head)<20:
+            time.sleep(1)
+            head.goto(0,0)
+            head.direction="stop"
+
+            for segment in segments:
+                segment.goto(1000,1000)
+            segments.clear()
+            score=0 
+            delay=0.1
+            sc.clear()
+            sc.write("score: {} High Score : {}".format(score, high_score), align="center", font=('ds-digital',24,"normal"))
+
+    time.sleep(delay)
+        
+wn.mainloop()
 
 
 
